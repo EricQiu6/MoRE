@@ -1,0 +1,20 @@
+diff --git a/sonicmoe/moe.py b/sonicmoe/moe.py
+index 08b7686..a74188b 100644
+--- a/sonicmoe/moe.py
++++ b/sonicmoe/moe.py
+@@ -248,8 +248,14 @@ class MoE(nn.Module):
+
+         # hidden_states -> (batch_size, query_length, hidden_size)
+
++        probs = F.softmax(router_logits, dim=-1, dtype=torch.float32)
++
++        # Store per-layer routing stats for external grouped loss computation
++        self._routing_acc_probs = probs.sum(0)              # [E], keeps gradient
++        self._routing_expert_freq = expert_frequency.float() # [E], non-differentiable
++
+         aux_loss = self._compute_switch_loss(
+             logits=router_logits,
+-            probs=F.softmax(router_logits, dim=-1, dtype=torch.float32),
++            probs=probs,
+             expert_frequency=expert_frequency,
+         )

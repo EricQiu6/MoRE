@@ -1,0 +1,47 @@
+# ==============================================================================
+# MoRE - Python Dependencies
+# ==============================================================================
+# Tier 1 (inspect the models on any machine, no GPU):
+#     pip install -r requirements.txt
+# Tier 2 (train, needs a Hopper GPU): run setup.sh, which installs the CUDA
+#     12.9 build of torch and SonicMoE from source, then applies these pins.
+#
+# The torch line below is the default build for your platform (CPU on most
+# machines). setup.sh replaces it with the CUDA 12.9 build that SonicMoE
+# requires. It is deliberately unpinned: SonicMoE manages its own torch,
+# ninja, and triton versions, and pinning here would fight it.
+#
+# Pinned to versions tested with transformers 5.1.0 (Feb 2026).
+# The modeling code (more/*) was updated for 5.1.0's API changes:
+#   - RoPE: compute_default_rope_parameters() + config.rope_parameters
+#   - Key mapping: conversion_mapping.py renames .block_sparse_moe. <-> .mlp.
+#   - DecoderLayer attribute: self.mlp (not self.block_sparse_moe)
+# ==============================================================================
+
+torch
+
+# Core ML
+transformers==5.1.0
+datasets==4.5.0
+
+# Scientific computing
+numpy==2.3.5
+
+# Required indirectly, so pinned even though nothing here imports them
+# directly:
+#   accelerate      -- transformers' Trainer refuses to run without it
+#   sentencepiece   -- backs LlamaTokenizerFast, which loads c4_tokenizer/
+#   tokenizers      -- transformers tokenizer backend
+#   safetensors     -- checkpoint serialization
+#   huggingface-hub -- transformers dependency
+accelerate==1.12.0
+sentencepiece==0.2.1
+tokenizers==0.22.2
+safetensors==0.7.0
+huggingface-hub==1.4.1
+
+# Optional: only used when training with --use_wandb.
+wandb==0.24.2
+
+# Sonic MoE: installed from source in setup.sh (https://github.com/Dao-AILab/sonic-moe)
+# SonicMoE manages its own: torch, ninja, triton, nvidia-cutlass-dsl, quack-kernels

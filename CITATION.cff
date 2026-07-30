@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the paper below."
+title: "MoRE: Mixture of Reused Experts"
+authors:
+  - given-names: "Eric S."
+    family-names: "Qiu"
+  - given-names: "Utku Umur"
+    family-names: "Acikalin"
+  - given-names: "Justin"
+    family-names: "Lovelace"
+  - given-names: "Christian"
+    family-names: "Belardi"
+  - given-names: "Arjun B."
+    family-names: "Mulchandani"
+  - given-names: "Carla P."
+    family-names: "Gomes"
+  - given-names: "Kilian Q."
+    family-names: "Weinberger"
+license: Apache-2.0
+preferred-citation:
+  type: conference-paper
+  title: "MoRE: Mixture of Reused Experts"
+  collection-title: "Conference on Language Modeling (COLM)"
+  year: 2026
+  authors:
+    - given-names: "Eric S."
+      family-names: "Qiu"
+    - given-names: "Utku Umur"
+      family-names: "Acikalin"
+    - given-names: "Justin"
+      family-names: "Lovelace"
+    - given-names: "Christian"
+      family-names: "Belardi"
+    - given-names: "Arjun B."
+      family-names: "Mulchandani"
+    - given-names: "Carla P."
+      family-names: "Gomes"
+    - given-names: "Kilian Q."
+      family-names: "Weinberger"

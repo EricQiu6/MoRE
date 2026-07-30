@@ -1,0 +1,63 @@
+MoRE: Mixture of Reused Experts
+Copyright 2026 The MoRE Authors
+
+Licensed under the Apache License, Version 2.0. See LICENSE.
+
+This product includes software developed by third parties:
+
+--------------------------------------------------------------------------
+HuggingFace Transformers -- Apache License 2.0
+    more/deepseek_v3/
+    more/qwen3_moe/
+    more/mixtral/
+
+These files are derived from the HuggingFace Transformers implementations of
+DeepSeek-v3, Qwen3-MoE, and Mixtral. The upstream copyright notices and the
+Apache-2.0 header are retained in each file, and each carries a notice of the
+modifications listed below.
+
+Modifications by the MoRE authors:
+  * added learnable per-layer depth embeddings applied before routing
+    (config field: use_depth_embedding)
+  * added cross-layer expert parameter tying
+    (config fields: grouping_factor, tying_strategy)
+
+--------------------------------------------------------------------------
+MoEUT -- MIT License
+    more/moeut_hf/
+    c4_tokenizer/ (all files)
+
+Copyright (c) 2024 Robert Csordas
+https://github.com/RobertCsordas/moeut
+
+more/moeut_hf/ is a wrapper around the MoEUT implementation, which is not
+bundled here and must be cloned separately. The c4_tokenizer/ files derive
+from the SentencePiece model in the MoEUT codebase.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+--------------------------------------------------------------------------
+SonicMoE -- Apache License 2.0
+    patches/sonicmoe_grouped_loss.patch
+    patches/sonicmoe_mixed_precision.patch
+
+https://github.com/Dao-AILab/sonic-moe
+
+These two files are diffs authored by the MoRE authors against SonicMoE.
+SonicMoE itself is not bundled; setup.sh clones it and applies these patches.
