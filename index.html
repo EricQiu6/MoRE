@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MoRE: Mixture of Reused Experts — COLM 2026</title>
+<meta name="description" content="MoRE shares expert pools across adjacent layers of a Mixture-of-Experts transformer, expanding the routing space without adding parameters. COLM 2026.">
+<meta property="og:title" content="MoRE: Mixture of Reused Experts">
+<meta property="og:description" content="Sharing expert pools across adjacent layers expands the routing space at no parameter cost. COLM 2026.">
+<meta property="og:type" content="article">
+<style>
+/* Design decision: single file, no external fonts or scripts, so the page loads
+   instantly over conference wifi when someone scans the QR at the poster. */
+:root{
+  --bg:#fbfbfa; --fg:#1a1a1a; --muted:#5c5c5c; --rule:#e2e0dc;
+  --accent:#b31b1b;            /* Cornell Carnelian, matches the poster */
+  --card:#ffffff;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#131313; --fg:#ececec; --muted:#a3a3a3; --rule:#2e2e2e;
+    --accent:#ff6b6b; --card:#1b1b1b; color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:860px;margin:0 auto;padding:0 20px}
+header{padding-block:56px 32px;border-bottom:1px solid var(--rule)}
+.venue{font-size:13px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);font-weight:700;margin:0 0 14px}
+h1{font-size:clamp(30px,5.2vw,46px);line-height:1.12;margin:0 0 18px;letter-spacing:-.02em;font-weight:800}
+h1 em{font-style:normal;color:var(--accent)}
+.authors{margin:0 0 6px;font-size:16.5px}
+.authors a{color:inherit;text-decoration:none;border-bottom:1px solid var(--rule)}
+.authors a:hover{border-color:var(--accent);color:var(--accent)}
+.affil{margin:0;color:var(--muted);font-size:14.5px}
+.links{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 17px;border-radius:9px;
+  background:var(--accent);color:#fff;text-decoration:none;font-weight:650;font-size:15px;
+  border:1px solid transparent}
+.btn.alt{background:transparent;color:var(--fg);border-color:var(--rule)}
+.btn:hover{opacity:.87}
+section{padding-block:38px;border-bottom:1px solid var(--rule)}
+h2{font-size:13px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
+  margin:0 0 16px;font-weight:700}
+p{margin:0 0 15px}
+.tldr{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--accent);
+  border-radius:9px;padding:20px 22px}
+.tldr p:last-child{margin-bottom:0}
+.tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:14.5px;font-variant-numeric:tabular-nums}
+th,td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--rule);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+thead th{color:var(--muted);font-weight:650;font-size:12.5px;text-transform:uppercase;letter-spacing:.05em}
+tr.win td{color:var(--accent);font-weight:700}
+.note{font-size:13.5px;color:var(--muted);margin-top:12px}
+.pdf{width:100%;height:78vh;min-height:460px;border:1px solid var(--rule);border-radius:9px;background:var(--card)}
+.pdfhint{display:none;font-size:14.5px;color:var(--muted)}
+@media(max-width:700px){.pdf{display:none}.pdfhint{display:block}}
+pre{background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:16px;
+  overflow-x:auto;font-size:13px;line-height:1.5;margin:0}
+.hire{background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:22px}
+.hire strong{color:var(--accent)}
+a.inline{color:var(--accent);text-decoration:none;border-bottom:1px solid currentColor}
+footer{padding-block:32px 60px;color:var(--muted);font-size:13.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="venue">COLM 2026 · San Francisco</p>
+  <h1>MoRE: Mixture of <em>Reused</em> Experts</h1>
+  <p class="authors">
+    Eric S. Qiu<sup>*</sup> · Utku Umur Acikalin<sup>*</sup> · Justin Lovelace ·
+    Christian Belardi · Arjun B. Mulchandani · Carla P. Gomes · Kilian Q. Weinberger
+  </p>
+  <p class="affil">Department of Computer Science, Cornell University · <sup>*</sup>Equal contribution</p>
+  <div class="links">
+    <a class="btn" href="paper.pdf">Paper (PDF)</a>
+    <a class="btn alt" href="poster.pdf">Poster</a>
+    <a class="btn alt" href="https://github.com/EricQiu6/MoRE">Code</a>
+    <a class="btn alt" href="#bibtex">BibTeX</a>
+  </div>
+</header>
+
+<section>
+  <h2>The idea in one paragraph</h2>
+  <div class="tldr">
+    <p>A standard Mixture-of-Experts (MoE) model gives every layer its <em>own private pool</em> of
+    N experts (small sub-networks, only a few of which run per token). Each layer's router can
+    therefore only ever pick from its own local set. <strong>MoRE lets adjacent layers share one
+    pool instead.</strong> Two neighbouring layers draw from a single pool of 2N experts while each
+    keeps its own router, so the number of routing combinations per layer grows from 35,960 to
+    635,376 — an <strong>18× larger routing space at zero parameter cost</strong>, because the total
+    count of distinct experts never changes. A tiny learnable <em>depth embedding</em> (one vector
+    per layer, added to the input before routing) lets the same shared experts behave slightly
+    differently depending on which layer called them.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Abstract</h2>
+  <p>Mixture-of-Experts (MoE) architectures decouple model capacity from computational cost, yet
+  incur high memory footprints as parameters grow linearly with the number of experts. Recurrent
+  Transformers achieve parameter efficiency by reusing layer weights, but typically lack the
+  capacity for competitive language modeling. We propose Mixture of Reused Experts (MoRE), a
+  hybrid that shares expert pools across groups of adjacent layers. Each layer retains its own
+  router but selects from a larger shared pool, expanding the diversity of routing combinations
+  without additional parameters. To enable shared experts to distinguish between layers, we
+  introduce lightweight learnable depth embeddings that condition each layer's input before
+  routing. Experiments across three model scales (114M–1.15B parameters) show that MoRE
+  consistently achieves lower perplexity and stronger downstream performance than standard MoEs
+  and state-of-the-art weight-sharing architectures at matched compute and parameter budgets,
+  with only minimal modifications to existing MoE implementations.</p>
+</section>
+
+<section>
+  <h2>Results</h2>
+  <p>Validation perplexity on C4 (lower is better). Models are matched by FLOPs per forward pass;
+  the Dense baseline is FLOPs-matched and therefore has fewer total parameters.</p>
+  <div class="tblwrap">
+  <table>
+    <thead><tr><th>Model</th><th>Small</th><th>Medium</th><th>Large</th></tr></thead>
+    <tbody>
+      <tr><td>MoEUT</td><td>16.94</td><td>14.69</td><td>12.78</td></tr>
+      <tr><td>Dense</td><td>16.30</td><td>15.34</td><td>13.07</td></tr>
+      <tr><td>DeepSeek-v3</td><td>15.98</td><td>13.53</td><td>11.88</td></tr>
+      <tr class="win"><td>MoRE (ours)</td><td>15.89</td><td>13.40</td><td>11.75</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="note">Downstream accuracy on the OLMo3 suite (5-shot, macro-average across benchmarks)
+  follows the same ordering: <strong>40.76 / 43.62 / 48.12</strong> for MoRE versus
+  39.69 / 41.16 / 47.05 for DeepSeek-v3. MoRE is the sole top performer at all three scales, and
+  the margin does not shrink as models get larger.</p>
+</section>
+
+<section>
+  <h2>Paper</h2>
+  <iframe class="pdf" src="paper.pdf" title="MoRE paper (PDF)"></iframe>
+  <p class="pdfhint"><a class="inline" href="paper.pdf">Open the paper (PDF, 15 pages)</a> —
+  inline preview is hidden on small screens.</p>
+</section>
+
+<section id="bibtex">
+  <h2>BibTeX</h2>
+<pre>@inproceedings{qiu2026more,
+  title     = {MoRE: Mixture of Reused Experts},
+  author    = {Qiu, Eric S. and Acikalin, Utku Umur and Lovelace, Justin and
+               Belardi, Christian and Mulchandani, Arjun B. and
+               Gomes, Carla P. and Weinberger, Kilian Q.},
+  booktitle = {Conference on Language Modeling (COLM)},
+  year      = {2026}
+}</pre>
+</section>
+
+<section>
+  <h2>Contact</h2>
+  <div class="hire">
+    <p><strong>Eric S. Qiu is applying to PhD programs and to industry research roles.</strong></p>
+    <p>If you are hiring or recruiting students and this work is in your area, he would be glad to
+    talk. Reach him at <a class="inline" href="mailto:sq225@cornell.edu">sq225@cornell.edu</a>,
+    or see <a class="inline" href="https://ericqiu6.github.io/">ericqiu6.github.io</a> for a CV and
+    other projects.</p>
+  </div>
+</section>
+
+<footer>
+  Cornell University · Department of Computer Science ·
+  <a class="inline" href="https://github.com/EricQiu6/MoRE">github.com/EricQiu6/MoRE</a>
+</footer>
+
+</div>
+</body>
+</html>
